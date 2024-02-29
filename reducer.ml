@@ -47,45 +47,11 @@ let rec substitute x s = fun t ->
   | Application (t1, t2) -> Application (substitute x s t1, substitute x s t2)
 ;;
 
-(* let rec reduce_cbv = fun t ->
-  match t with
-  | Application (Abstraction (x, t1), t2) ->
-    (match reduce_cbv t2 with
-    | Some t2' -> Some (substitute x t2' t1)
-    | None -> Some (substitute x t2 t1))
-  | Application (t1, t2) ->
-    (match reduce_cbv t2 with
-    | Some t2' -> Some (Application (t1, t2'))
-    | None -> 
-      match reduce_cbv t1 with
-      | Some t1' -> Some (Application (t1', t2))
-      | None -> None (* check if this is problematic*)
-      )
-  | _ -> None
-;; *)
-
-(* let rec reduce_cbv = function
-(* base cases *)
-| Abstraction (_, _) -> None
-| Application (Abstraction(x, t1), Abstraction(y, t2)) ->
-  let v2 = Abstraction (y, t2) in
-  Some (substitute x v2 t1)
-(* recursive cases*)
-| Application (t1, t2) ->
-  (match reduce_cbv t1 with
-  | Some t1' -> Some (Application(t1', t2))
-  | None -> (* t1 is a value, abstraction*)
-    let v1 = t1 in
-    match reduce_cbv t2 with
-    | Some t2' -> Some (Application (v1, t2'))
-    | None -> None)
-| _ -> None
-;; *)
-
 let rec reduce_cbv = function
   | Abstraction (_, _) -> None (* Base case: abstraction cannot be further reduced *)
   | Application (Abstraction (x, t1), t2) ->
-    ( match reduce_cbv t2 with
+    ( 
+      match reduce_cbv t2 with
       | Some t2' -> Some (Application (Abstraction (x, t1), t2'))
       | None -> 
         (
@@ -96,12 +62,14 @@ let rec reduce_cbv = function
         )
     ) (* Reduction of application with abstraction *)
   | Application (t1, t2) ->
-    (match reduce_cbv t1 with
-    | Some t1' -> Some (Application (t1', t2))
-    | None ->
-      (match reduce_cbv t2 with
-      | Some t2' -> Some (Application (t1, t2'))
-      | None -> None)) (* Non-abstraction application case *)
+    (
+      match reduce_cbv t1 with
+      | Some t1' -> Some (Application (t1', t2))
+      | None ->
+        (match reduce_cbv t2 with
+        | Some t2' -> Some (Application (t1, t2'))
+        | None -> None)
+    ) (* Non-abstraction application case *)
   | _ -> None (* Base case: variables cannot be further reduced *)
 ;;
 

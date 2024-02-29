@@ -169,6 +169,19 @@ let s12_result_cbn = "
 (\\y.(\\z.(\\w.(\\v.(\\u.(z (w (v u))))))))
 "
 
+
+let evaluate_and_print_result s_name s name1 name2 result_cbn result_cbv =
+  printf "\nEvaluating %s:\n%s\n" s_name s;
+  printf "in CBN semantics:\n\n";
+  ignore (evaluate ~verbose:true reduce_cbn (parse s));
+  printf "Designated result of %s: %s\n" name1 result_cbn;
+  printf "in CBV semantics:\n\n";
+  ignore (evaluate ~verbose:true reduce_cbv (parse s));
+  printf "Designated result of %s: %s\n\n" name2 result_cbv;
+;;
+
+
+
 let () =
   printf "\nEvaluating s1:\n%s\n" s1;
   printf "in CBN semantics:\n\n";
@@ -265,4 +278,4 @@ let () =
   printf "in CBV semantics:\n\n";
   ignore (evaluate ~verbose:true reduce_cbv (parse s12));
   printf "Designated result of s12_cbv: %s\n\n" s12_result_cbv;
-
+  
